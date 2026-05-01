@@ -7,29 +7,27 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // ✅ FIX: URL se redirect param lo aur sessionStorage mein save karo
-    // Jab ProductDetailPage /login?redirect=/checkout?productId=123 bhejta hai
-    // toh yahan se utha ke rakh lo — Google login ke baad kaam aayega
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get("redirect");
     if (redirect) {
       sessionStorage.setItem("redirectAfterLogin", redirect);
     }
-
     checkAuth();
   }, []);
 
   useEffect(() => {
     if (!loading && user) {
-      const redirectTo = sessionStorage.getItem("redirectAfterLogin") || "/";
+      const redirectTo = sessionStorage.getItem("redirectAfterLogin"); // ✅ no fallback "/"
       sessionStorage.removeItem("redirectAfterLogin");
-      navigate(redirectTo);
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true }); // ✅ sirf tab navigate jab redirect ho
+      }
+      // ✅ redirect nahi → page pe hi raho
     }
   }, [user, loading, navigate]);
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f8f9fc 0%, #e8edf7 100%)", display: "flex", flexDirection: "column", fontFamily: '"Plus Jakarta Sans", "Noto Sans", sans-serif' }}>
-      {/* HEADER */}
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 40px", borderBottom: "1px solid #e7ebf3", background: "white" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => navigate("/")}>
           <div style={{ width: "20px", height: "20px", color: "#0e121b" }}>
@@ -41,7 +39,6 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* MAIN CARD */}
       <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
         <div style={{ width: "100%", maxWidth: "420px", background: "white", borderRadius: "20px", boxShadow: "0 8px 40px rgba(0,0,0,0.10)", padding: "40px 36px", display: "flex", flexDirection: "column", gap: "24px" }}>
 
