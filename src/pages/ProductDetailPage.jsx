@@ -39,9 +39,9 @@ export default function ProductDetailPage() {
       setCartOpen(true);
     },
     onError: () => {
-      // ✅ FIX: /login pe bhejo, redirect save karo
+      // ✅ FIX: /users/signin pe bhejo, redirect save karo
       sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
-      navigate("/login");
+      navigate("/users/signin");
     },
   });
 
@@ -71,7 +71,7 @@ export default function ProductDetailPage() {
   // ✅ FIX: Login check + redirect save helper
   const goToLoginWithRedirect = (redirectPath) => {
     sessionStorage.setItem("redirectAfterLogin", redirectPath);
-    navigate("/login");
+    navigate("/users/signin");
   };
 
   return (
