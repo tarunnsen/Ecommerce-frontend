@@ -12,20 +12,32 @@ export default function AuthCallback() {
     const redirect = params.get("redirect") || "/";
 
     if (token) {
-      // ✅ Token localStorage mein save karo
+      // ✅ Step 1 — Token save karo
       localStorage.setItem("userToken", token);
 
-      // ✅ Token se user info nikalo
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      setUser({
-        _id: payload.id,
-        email: payload.email,
-        name: payload.name,
-      });
+      // ✅ Step 2 — User set karo
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUser({
+          _id: payload.id,
+          email: payload.email,
+          name: payload.name,
+        });
+        console.log("✅ Token saved, user set:", payload.name);
+      } catch (err) {
+        console.log("💥 Token parse error:", err.message);
+        navigate("/login", { replace: true });
+        return;
+      }
 
-      // ✅ Sahi page pe bhejo
-      navigate(decodeURIComponent(redirect), { replace: true });
+      // ✅ Step 3 — 300ms wait karo phir navigate
+      // Race condition fix — token save hone ka time dena zaroori hai
+      setTimeout(() => {
+        navigate(decodeURIComponent(redirect), { replace: true });
+      }, 300);
+
     } else {
+      console.log("❌ No token in URL");
       navigate("/login", { replace: true });
     }
   }, []);
