@@ -39,7 +39,9 @@ export default function ProductDetailPage() {
       setCartOpen(true);
     },
     onError: () => {
-      navigate("/users/signin");
+      // ✅ FIX: /login pe bhejo, redirect save karo
+      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+      navigate("/login");
     },
   });
 
@@ -47,9 +49,7 @@ export default function ProductDetailPage() {
     return (
       <>
         <Navbar />
-        <div style={{ textAlign: "center", padding: "80px", fontSize: "18px" }}>
-          Loading...
-        </div>
+        <div style={{ textAlign: "center", padding: "80px", fontSize: "18px" }}>Loading...</div>
       </>
     );
   }
@@ -68,10 +68,15 @@ export default function ProductDetailPage() {
   const { product, relatedProducts } = data;
   const displayImage = mainImage || product.images?.[0] || "/images/default.jpg";
 
+  // ✅ FIX: Login check + redirect save helper
+  const goToLoginWithRedirect = (redirectPath) => {
+    sessionStorage.setItem("redirectAfterLogin", redirectPath);
+    navigate("/login");
+  };
+
   return (
     <div style={{ background: "#f8f9fc", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      {/* ✅ Shared Navbar — hardcoded header hata diya */}
       <Navbar />
 
       {/* PRODUCT SECTION */}
@@ -122,18 +127,14 @@ export default function ProductDetailPage() {
 
           {product.discountPrice ? (
             <div>
-              <p style={{ color: "#9ca3af", textDecoration: "line-through", fontSize: "16px" }}>
-                ₹{product.price}
-              </p>
+              <p style={{ color: "#9ca3af", textDecoration: "line-through", fontSize: "16px" }}>₹{product.price}</p>
               <p style={{ fontSize: "20px", fontWeight: "600", color: "#16a34a" }}>
                 ₹{product.discountPrice}{" "}
                 <span style={{ fontSize: "14px", color: "#6b7280" }}>(Discounted)</span>
               </p>
             </div>
           ) : (
-            <p style={{ fontSize: "20px", fontWeight: "600", color: "#111827" }}>
-              ₹{product.price}
-            </p>
+            <p style={{ fontSize: "20px", fontWeight: "600", color: "#111827" }}>₹{product.price}</p>
           )}
 
           {product.material && (
@@ -171,11 +172,14 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* Buttons */}
+          {/* ✅ FIX: Buttons — sahi redirect */}
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "16px" }}>
             <button
               onClick={() => {
-                if (!user) { navigate("/users/signin"); return; }
+                if (!user) {
+                  goToLoginWithRedirect(window.location.pathname);
+                  return;
+                }
                 addToCart();
               }}
               disabled={addingToCart}
@@ -192,7 +196,11 @@ export default function ProductDetailPage() {
 
             <button
               onClick={() => {
-                if (!user) { navigate("/users/signin"); return; }
+                if (!user) {
+                  // ✅ FIX: Checkout URL save karo — login ke baad seedha checkout pe
+                  goToLoginWithRedirect(`/checkout?productId=${product._id}`);
+                  return;
+                }
                 navigate(`/checkout?productId=${product._id}`);
               }}
               style={{
