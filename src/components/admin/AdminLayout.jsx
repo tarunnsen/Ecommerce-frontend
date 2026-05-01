@@ -1,120 +1,119 @@
-// src/components/admin/AdminLayout.jsx
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { adminService } from "../../services/adminService";
 
 export default function AdminLayout({ children }) {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const { mutate: logout } = useMutation({
-        mutationFn: adminService.logout,
-        onSuccess: () => {
-            localStorage.removeItem("adminToken"); // ✅ Token clear karo
-            navigate("/admin/login");
-        },
-    });
+  const { mutate: logout } = useMutation({
+    mutationFn: adminService.logout,
+    onSuccess: () => {
+      localStorage.removeItem("adminToken");
+      navigate("/admin/login");
+    },
+  });
 
-    const navLinks = [
-        { to: "/admin/products", label: "Products" },
-        { to: "/admin/orders", label: "Orders" },
-        { to: "/admin/products/add", label: "+ Add Product" },
-    ];
+  const navLinks = [
+    { to: "/admin/products", label: "Products" },
+    { to: "/admin/orders", label: "Orders" },
+    { to: "/admin/products/add", label: "+ Add Product" },
+  ];
 
-    const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
-    return (
-        <div style={{ minHeight: "100vh", background: "#f9fafb", display: "flex", flexDirection: "column" }}>
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
 
-            {/* ✅ Navbar */}
-            <header style={{ background: "#111827", boxShadow: "0 2px 8px rgba(0,0,0,0.3)", position: "sticky", top: 0, zIndex: 100 }}>
-                <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" }}>
+      {/* ✅ NAVBAR */}
+      <header className="bg-[#0e121b] border-b border-gray-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-3 flex items-center justify-between">
 
-                    {/* Logo */}
-                    <Link to="/admin/products" style={{ textDecoration: "none" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <div style={{ width: "32px", height: "32px", background: "#3b82f6", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: "700", fontSize: "16px" }}>
-                                T
-                            </div>
-                            <span style={{ color: "white", fontWeight: "700", fontSize: "18px" }}>TechFocus Admin</span>
-                        </div>
-                    </Link>
+          {/* Logo — same style as user Navbar */}
+          <Link to="/admin/products" style={{ textDecoration: "none" }}>
+            <h2 className="text-lg font-bold text-white whitespace-nowrap">
+              TechFocus Admin
+            </h2>
+          </Link>
 
-                    {/* Desktop Nav */}
-                    <nav style={{ display: "flex", alignItems: "center", gap: "8px" }} className="hidden-mobile">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.to}
-                                to={link.to}
-                                style={{
-                                    padding: "8px 16px", borderRadius: "6px", textDecoration: "none",
-                                    fontSize: "14px", fontWeight: "500",
-                                    background: isActive(link.to) ? "#3b82f6" : "transparent",
-                                    color: isActive(link.to) ? "white" : "#d1d5db",
-                                    transition: "all 0.2s",
-                                }}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
+          {/* DESKTOP NAV */}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                style={{ textDecoration: "none" }}
+                className={`text-sm font-medium px-4 py-2 rounded-xl transition-colors ${
+                  isActive(link.to)
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
 
-                        {/* Admin Avatar + Logout */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "16px", paddingLeft: "16px", borderLeft: "1px solid #374151" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#3b82f6", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: "700", fontSize: "14px" }}>
-                                    A
-                                </div>
-                                <span style={{ color: "#d1d5db", fontSize: "14px" }}>Admin</span>
-                            </div>
-                            <button
-                                onClick={() => logout()}
-                                style={{ padding: "6px 14px", background: "#dc2626", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "500" }}
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    </nav>
+            {/* Divider + Admin + Logout */}
+            <div className="flex items-center gap-3 ml-4 pl-4 border-l border-gray-700">
+              <span className="text-sm text-gray-400 hidden md:inline">Admin</span>
+              <button
+                onClick={() => logout()}
+                className="h-9 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold flex items-center whitespace-nowrap transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
 
-                    {/* Hamburger */}
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "white", fontSize: "24px", display: "none" }}
-                        className="show-mobile"
-                    >
-                        ☰
-                    </button>
-                </div>
-
-                {/* Mobile Menu */}
-                {menuOpen && (
-                    <div style={{ background: "#1f2937", padding: "16px 24px", borderTop: "1px solid #374151" }}>
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.to}
-                                to={link.to}
-                                onClick={() => setMenuOpen(false)}
-                                style={{ display: "block", padding: "10px 0", color: "#d1d5db", textDecoration: "none", fontSize: "15px", borderBottom: "1px solid #374151" }}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                        <button
-                            onClick={() => logout()}
-                            style={{ marginTop: "12px", width: "100%", padding: "10px", background: "#dc2626", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "14px" }}
-                        >
-                            Logout
-                        </button>
-                    </div>
-                )}
-            </header>
-
-            {/* Page Content */}
-            <main style={{ flex: 1, maxWidth: "1280px", width: "100%", margin: "0 auto", padding: "32px 24px" }}>
-                {children}
-            </main>
-
+          {/* HAMBURGER — mobile only */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-gray-300 focus:outline-none text-xl ml-1"
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
         </div>
-    );
+      </header>
+
+      {/* MOBILE DROPDOWN */}
+      {menuOpen && (
+        <div className="md:hidden flex flex-col items-center bg-[#111827] border-b border-gray-700 py-2 shadow-md">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setMenuOpen(false)}
+              style={{ textDecoration: "none" }}
+              className={`text-sm font-medium py-2 w-full text-center border-b border-gray-700 ${
+                isActive(link.to)
+                  ? "text-blue-400 bg-gray-800"
+                  : "text-gray-300"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          {/* Admin label + Logout */}
+          <span className="text-sm font-medium py-1 text-gray-500 mt-1">
+            Admin
+          </span>
+          <button
+            onClick={() => logout()}
+            className="text-sm font-medium py-2 text-red-400"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
+      {/* PAGE CONTENT */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-10 py-8">
+        {children}
+      </main>
+
+    </div>
+  );
 }
