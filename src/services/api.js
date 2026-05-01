@@ -9,8 +9,11 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
+  
+  // ✅ NAYA LOG ADD KARO
+  const userToken = localStorage.getItem("userToken");
+  console.log("🔑 userToken in interceptor:", userToken ? "EXISTS: " + userToken.substring(0, 20) : "NULL ❌");
 
-  // ✅ FIX: Admin routes pe SIRF adminToken lagao
   const isAdminRoute = config.url?.startsWith("/admin");
 
   if (isAdminRoute) {
@@ -19,12 +22,12 @@ api.interceptors.request.use((config) => {
       config.headers["Authorization"] = `Bearer ${adminToken}`;
     }
   } else {
-    // ✅ Baaki sab routes pe SIRF userToken lagao
-    const userToken = localStorage.getItem("userToken");
     if (userToken) {
       config.headers["Authorization"] = `Bearer ${userToken}`;
     }
   }
+
+  console.log("📤 Auth header:", config.headers["Authorization"] ? "SET ✅" : "NOT SET ❌");
 
   return config;
 });
