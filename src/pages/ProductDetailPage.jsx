@@ -37,15 +37,23 @@ export default function ProductDetailPage() {
     },
   });
 
+  // AFTER ✅
   const { mutate: addToCart, isPending: addingToCart } = useMutation({
     mutationFn: () => cartService.addToCart(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       setCartOpen(true);
     },
-    onError: () => {
-      sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
-      navigate("/login");
+    onError: (error) => {
+      // ✅ 401 hai toh login pe bhejo, warna cart already open karo
+      if (error?.response?.status === 401) {
+        sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
+        navigate("/login");
+      } else {
+        // ✅ Token hai but koi aur error — retry karo directly
+        console.log("Cart error:", error?.response?.data);
+        setCartOpen(true); // drawer open karo — user logged in hai
+      }
     },
   });
 
