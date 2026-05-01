@@ -37,15 +37,11 @@ export function AuthProvider({ children }) {
   };
 
   // ✅ FIX: Redirect URL directly backend ko pass karo via query param
-  const loginWithGoogle = (redirectPath = null) => {
-    const savePath = redirectPath || (window.location.pathname + window.location.search);
-
-    const finalPath = (savePath !== "/login" && savePath !== "/users/signin")
-      ? savePath
-      : "/";
-
+  const loginWithGoogle = () => {
+    // ✅ sessionStorage se lo — LoginPage ne save kiya hoga
+    const savedPath = sessionStorage.getItem("redirectAfterLogin") || "/";
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-    window.location.href = `${apiUrl}/auth/google?redirect=${encodeURIComponent(finalPath)}`;
+    window.location.href = `${apiUrl}/auth/google?redirect=${encodeURIComponent(savedPath)}`;
   };
 
   return (

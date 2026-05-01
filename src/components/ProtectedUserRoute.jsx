@@ -1,4 +1,3 @@
-// src/components/ProtectedUserRoute.jsx
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -14,6 +13,8 @@ export default function ProtectedUserRoute({ children }) {
   }
 
   if (!user) {
+    // ✅ Yahan save karo — current URL jahan jaana tha
+    sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
     return <Navigate to="/login" replace />;
   }
 

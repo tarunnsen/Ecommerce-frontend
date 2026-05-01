@@ -3,10 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const { user, loading, loginWithGoogle } = useAuth();
+  // ✅ FIX 1: checkAuth add kiya
+  const { user, loading, loginWithGoogle, checkAuth } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ FIX: Jahan se aaya tha wahan bhejo
+  // ✅ FIX 2: OAuth wapas aane ke baad checkAuth trigger karo
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // ✅ User mil gaya toh saved path pe redirect karo
   useEffect(() => {
     if (!loading && user) {
       const redirectTo = sessionStorage.getItem("redirectAfterLogin") || "/";
@@ -51,7 +57,7 @@ export default function LoginPage() {
             <div style={{ flex: 1, height: "1px", background: "#e7ebf3" }} />
           </div>
 
-          {/* ✅ Google Button — loginWithGoogle use kar raha hai */}
+          {/* Google Button */}
           <button
             onClick={() => loginWithGoogle()}
             style={{ width: "100%", height: "52px", background: "white", border: "2px solid #e7ebf3", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: "#0e121b", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
