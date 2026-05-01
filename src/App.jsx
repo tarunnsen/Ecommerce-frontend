@@ -9,6 +9,10 @@ import LoginPage from "./pages/LoginPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import AuthCallback from "./pages/AuthCallback";
+
+// Routes mein add karo
+<Route path="/auth/callback" element={<AuthCallback />} />
 
 // Admin Pages
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -39,6 +43,7 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* ✅ Protected User Routes — login hona zaroori hai */}
       <Route

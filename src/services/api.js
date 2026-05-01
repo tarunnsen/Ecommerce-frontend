@@ -6,19 +6,24 @@ const api = axios.create({
 });
 
 // ✅ Har request mein token header mein add karo
-api.interceptors.request.use(
-  (config) => {
-    console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
-    
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    
+api.interceptors.request.use((config) => {
+  console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
+
+  // ✅ Admin token
+  const adminToken = localStorage.getItem("adminToken");
+  if (adminToken) {
+    config.headers["Authorization"] = `Bearer ${adminToken}`;
     return config;
-  },
-  (error) => Promise.reject(error)
-);
+  }
+
+  // ✅ User token — naya
+  const userToken = localStorage.getItem("userToken");
+  if (userToken) {
+    config.headers["Authorization"] = `Bearer ${userToken}`;
+  }
+
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,

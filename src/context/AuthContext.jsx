@@ -12,28 +12,37 @@ export function AuthProvider({ children }) {
   }, []);
 
   const checkAuth = async () => {
-    const tryCheck = async (attemptsLeft) => {
-      try {
-        const res = await api.get("/cart/auth-check");
-        if (res.data.authenticated) {
-          const userRes = await api.get("/payment/user/details");
-          setUser(userRes.data);
-        } else if (attemptsLeft > 0) {
-          await new Promise((r) => setTimeout(r, 1000)); // ✅ 600 → 1000ms
-          return tryCheck(attemptsLeft - 1);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        if (attemptsLeft > 0) {
-          await new Promise((r) => setTimeout(r, 1000)); // ✅ 600 → 1000ms
-          return tryCheck(attemptsLeft - 1);
-        }
-        setUser(null);
-      }
-    };
+    // ✅ Pehle localStorage check karo — cookie nahi
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
 
-    await tryCheck(5); // ✅ 3 → 5 attempts
+    try {
+      // Token se user info nikalo directly
+      const payload = JSON.parse(atob(token.split(".")[1]));
+
+      // Token expire toh nahi hua?
+      if (payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem("userToken");
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      // ✅ User set karo
+      setUser({
+        _id: payload.id,
+        email: payload.email,
+        name: payload.name,
+      });
+    } catch (err) {
+      localStorage.removeItem("userToken");
+      setUser(null);
+    }
+
     setLoading(false);
   };
 
