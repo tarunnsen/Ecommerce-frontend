@@ -1,3 +1,5 @@
+// src/services/api.js — FULL FILE
+
 import axios from "axios";
 
 const api = axios.create({
@@ -5,21 +7,23 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// ✅ Har request mein token header mein add karo
 api.interceptors.request.use((config) => {
   console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
 
-  // ✅ Admin token
-  const adminToken = localStorage.getItem("adminToken");
-  if (adminToken) {
-    config.headers["Authorization"] = `Bearer ${adminToken}`;
-    return config;
-  }
+  // ✅ FIX: Admin routes pe SIRF adminToken lagao
+  const isAdminRoute = config.url?.startsWith("/admin");
 
-  // ✅ User token — naya
-  const userToken = localStorage.getItem("userToken");
-  if (userToken) {
-    config.headers["Authorization"] = `Bearer ${userToken}`;
+  if (isAdminRoute) {
+    const adminToken = localStorage.getItem("adminToken");
+    if (adminToken) {
+      config.headers["Authorization"] = `Bearer ${adminToken}`;
+    }
+  } else {
+    // ✅ Baaki sab routes pe SIRF userToken lagao
+    const userToken = localStorage.getItem("userToken");
+    if (userToken) {
+      config.headers["Authorization"] = `Bearer ${userToken}`;
+    }
   }
 
   return config;
