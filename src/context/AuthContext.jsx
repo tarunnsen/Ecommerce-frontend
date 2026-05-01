@@ -36,13 +36,16 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // ✅ FIX: Current path save karo, phir Google pe bhejo
+  // ✅ FIX: Redirect URL directly backend ko pass karo via query param
   const loginWithGoogle = (redirectPath = null) => {
     const savePath = redirectPath || (window.location.pathname + window.location.search);
-    if (savePath !== "/login" && savePath !== "/users/signin") {
-      sessionStorage.setItem("redirectAfterLogin", savePath);
-    }
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/google`;
+
+    const finalPath = (savePath !== "/login" && savePath !== "/users/signin")
+      ? savePath
+      : "/";
+
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    window.location.href = `${apiUrl}/auth/google?redirect=${encodeURIComponent(finalPath)}`;
   };
 
   return (
