@@ -3,16 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  // ✅ FIX 1: checkAuth add kiya
   const { user, loading, loginWithGoogle, checkAuth } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ FIX 2: OAuth wapas aane ke baad checkAuth trigger karo
   useEffect(() => {
+    // ✅ FIX: URL se redirect param lo aur sessionStorage mein save karo
+    // Jab ProductDetailPage /login?redirect=/checkout?productId=123 bhejta hai
+    // toh yahan se utha ke rakh lo — Google login ke baad kaam aayega
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    if (redirect) {
+      sessionStorage.setItem("redirectAfterLogin", redirect);
+    }
+
     checkAuth();
   }, []);
 
-  // ✅ User mil gaya toh saved path pe redirect karo
   useEffect(() => {
     if (!loading && user) {
       const redirectTo = sessionStorage.getItem("redirectAfterLogin") || "/";
@@ -39,7 +45,6 @@ export default function LoginPage() {
       <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
         <div style={{ width: "100%", maxWidth: "420px", background: "white", borderRadius: "20px", boxShadow: "0 8px 40px rgba(0,0,0,0.10)", padding: "40px 36px", display: "flex", flexDirection: "column", gap: "24px" }}>
 
-          {/* Icon */}
           <div style={{ textAlign: "center" }}>
             <div style={{ width: "64px", height: "64px", background: "linear-gradient(135deg, #306de8, #5b8ef0)", borderRadius: "16px", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: "16px", boxShadow: "0 4px 16px rgba(48,109,232,0.3)" }}>
               <svg width="32" height="32" fill="white" viewBox="0 0 256 256">
@@ -50,14 +55,12 @@ export default function LoginPage() {
             <p style={{ fontSize: "14px", color: "#4e6797", margin: 0 }}>Sign in to continue shopping</p>
           </div>
 
-          {/* Divider */}
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ flex: 1, height: "1px", background: "#e7ebf3" }} />
             <span style={{ fontSize: "13px", color: "#4e6797", whiteSpace: "nowrap" }}>Sign in with</span>
             <div style={{ flex: 1, height: "1px", background: "#e7ebf3" }} />
           </div>
 
-          {/* Google Button */}
           <button
             onClick={() => loginWithGoogle()}
             style={{ width: "100%", height: "52px", background: "white", border: "2px solid #e7ebf3", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", cursor: "pointer", fontSize: "15px", fontWeight: "700", color: "#0e121b", transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
@@ -73,7 +76,6 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          {/* Privacy note */}
           <p style={{ fontSize: "12px", color: "#4e6797", textAlign: "center", margin: 0, lineHeight: "1.5" }}>
             Protected by Google reCAPTCHA.{" "}
             <span style={{ textDecoration: "underline", cursor: "pointer" }}>Privacy Policy</span> applies.

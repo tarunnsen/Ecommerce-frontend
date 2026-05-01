@@ -12,19 +12,33 @@ export function AuthProvider({ children }) {
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const res = await api.get("/cart/auth-check");
-      if (res.data.authenticated) {
-        const userRes = await api.get("/payment/user/details");
-        setUser(userRes.data);
-      } else {
+    // ✅ Cross-domain cookie ke liye retry logic
+    // Render → Vercel alag domains hain, cookie set hone mein
+    // 1-2 requests lag jaati hain, isliye 3 baar try karo
+    const tryCheck = async (attemptsLeft) => {
+      try {
+        const res = await api.get("/cart/auth-check");
+        if (res.data.authenticated) {
+          const userRes = await api.get("/payment/user/details");
+          setUser(userRes.data);
+        } else if (attemptsLeft > 0) {
+          // ✅ 600ms ruko, phir dobara try karo
+          await new Promise((r) => setTimeout(r, 600));
+          return tryCheck(attemptsLeft - 1);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        if (attemptsLeft > 0) {
+          await new Promise((r) => setTimeout(r, 600));
+          return tryCheck(attemptsLeft - 1);
+        }
         setUser(null);
       }
-    } catch (err) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    await tryCheck(3);
+    setLoading(false); // ✅ Sirf ek baar — sab attempts ke baad
   };
 
   const logout = async () => {
@@ -36,9 +50,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // ✅ FIX: Redirect URL directly backend ko pass karo via query param
   const loginWithGoogle = () => {
-    // ✅ sessionStorage se lo — LoginPage ne save kiya hoga
     const savedPath = sessionStorage.getItem("redirectAfterLogin") || "/";
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
     window.location.href = `${apiUrl}/auth/google?redirect=${encodeURIComponent(savedPath)}`;
