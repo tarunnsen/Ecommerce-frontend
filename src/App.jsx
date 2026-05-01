@@ -38,7 +38,7 @@ function App() {
       {/* ✅ Public Routes — koi bhi access kar sakta hai */}
       <Route path="/" element={<HomePage />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
-      <Route path="/users/signin" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* ✅ Protected User Routes — login hona zaroori hai */}
       <Route

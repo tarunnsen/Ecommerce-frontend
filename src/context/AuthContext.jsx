@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
   // ✅ FIX: Current path save karo, phir Google pe bhejo
   const loginWithGoogle = (redirectPath = null) => {
     const savePath = redirectPath || (window.location.pathname + window.location.search);
-    if (savePath !== "/login") {
+    if (savePath !== "/login" && savePath !== "/users/signin") {
       sessionStorage.setItem("redirectAfterLogin", savePath);
     }
     window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/google`;
