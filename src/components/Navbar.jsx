@@ -14,19 +14,16 @@ export default function Navbar() {
   const handleLogout = async () => {
     await logout();
     setMobileOpen(false);
-    navigate("/users/signin");
+    navigate("/login"); // ✅ FIXED
   };
 
   return (
     <>
       <header className="flex items-center justify-between border-b px-4 md:px-10 py-3">
-
-        {/* LOGO */}
         <Link to="/" style={{ textDecoration: "none" }}>
           <h2 className="text-lg font-bold text-[#0e121b] whitespace-nowrap">TechFocus</h2>
         </Link>
 
-        {/* DESKTOP NAV — sirf laptop pe dikhega */}
         <div className="hidden md:flex items-center gap-9">
           <a href="#" className="text-sm font-medium text-[#0e121b]">Women</a>
           <a href="#" className="text-sm font-medium text-[#0e121b]">Men</a>
@@ -34,10 +31,7 @@ export default function Navbar() {
           <a href="#" className="text-sm font-medium text-[#0e121b]">Beauty</a>
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="flex gap-2 items-center">
-
-          {/* ✅ Auth buttons — sirf desktop pe — mobile pe nahi */}
           {user ? (
             <>
               <span className="text-sm font-medium text-[#0e121b] hidden md:inline">
@@ -52,7 +46,7 @@ export default function Navbar() {
             </>
           ) : (
             <Link
-              to="/users/signin"
+              to="/login" // ✅ FIXED
               className="hidden md:flex h-9 px-3 rounded-xl bg-[#e7ebf3] text-sm font-bold items-center whitespace-nowrap"
               style={{ textDecoration: "none" }}
             >
@@ -60,7 +54,6 @@ export default function Navbar() {
             </Link>
           )}
 
-          {/* Cart — hamesha dikhega */}
           <button
             onClick={() => setCartOpen(true)}
             className="h-9 px-2.5 rounded-xl bg-[#e7ebf3] text-sm font-bold flex items-center"
@@ -68,7 +61,6 @@ export default function Navbar() {
             🛍️
           </button>
 
-          {/* Hamburger — sirf mobile pe */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="md:hidden text-gray-600 focus:outline-none text-xl ml-1"
@@ -78,7 +70,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* MOBILE DROPDOWN — sirf mobile pe */}
       {mobileOpen && (
         <div className="md:hidden flex flex-col items-center bg-white border-b py-2 shadow-md">
           <a href="#" className="text-sm font-medium py-2">Women</a>
@@ -93,7 +84,6 @@ export default function Navbar() {
           </Link>
           <a href="#" className="text-sm font-medium py-2">Beauty</a>
 
-          {/* ✅ Mobile mein naam + logout */}
           {user ? (
             <>
               <span className="text-sm font-medium py-1 text-gray-500">
@@ -108,7 +98,7 @@ export default function Navbar() {
             </>
           ) : (
             <Link
-              to="/users/signin"
+              to="/login" // ✅ FIXED
               onClick={() => setMobileOpen(false)}
               className="text-sm font-medium py-2"
             >
