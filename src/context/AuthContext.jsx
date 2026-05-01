@@ -12,9 +12,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const checkAuth = async () => {
-    // ✅ Cross-domain cookie ke liye retry logic
-    // Render → Vercel alag domains hain, cookie set hone mein
-    // 1-2 requests lag jaati hain, isliye 3 baar try karo
     const tryCheck = async (attemptsLeft) => {
       try {
         const res = await api.get("/cart/auth-check");
@@ -22,23 +19,22 @@ export function AuthProvider({ children }) {
           const userRes = await api.get("/payment/user/details");
           setUser(userRes.data);
         } else if (attemptsLeft > 0) {
-          // ✅ 600ms ruko, phir dobara try karo
-          await new Promise((r) => setTimeout(r, 600));
+          await new Promise((r) => setTimeout(r, 1000)); // ✅ 600 → 1000ms
           return tryCheck(attemptsLeft - 1);
         } else {
           setUser(null);
         }
       } catch (err) {
         if (attemptsLeft > 0) {
-          await new Promise((r) => setTimeout(r, 600));
+          await new Promise((r) => setTimeout(r, 1000)); // ✅ 600 → 1000ms
           return tryCheck(attemptsLeft - 1);
         }
         setUser(null);
       }
     };
 
-    await tryCheck(3);
-    setLoading(false); // ✅ Sirf ek baar — sab attempts ke baad
+    await tryCheck(5); // ✅ 3 → 5 attempts
+    setLoading(false);
   };
 
   const logout = async () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ✅ useEffect add kiya
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "../services/productService";
@@ -19,10 +19,15 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, checkAuth } = useAuth(); // ✅ checkAuth add kiya
 
   const [mainImage, setMainImage] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // ✅ Page load pe fresh auth check — login ke baad redirect aane par
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
@@ -39,7 +44,6 @@ export default function ProductDetailPage() {
       setCartOpen(true);
     },
     onError: () => {
-      // ✅ FIX: /login pe bhejo, redirect save karo
       sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
       navigate("/login");
     },
@@ -68,7 +72,6 @@ export default function ProductDetailPage() {
   const { product, relatedProducts } = data;
   const displayImage = mainImage || product.images?.[0] || "/images/default.jpg";
 
-  // ✅ FIX: Login check + redirect save helper
   const goToLoginWithRedirect = (redirectPath) => {
     sessionStorage.setItem("redirectAfterLogin", redirectPath);
     navigate("/login");
@@ -172,7 +175,6 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* ✅ FIX: Buttons — sahi redirect */}
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "16px" }}>
             <button
               onClick={() => {
@@ -197,7 +199,6 @@ export default function ProductDetailPage() {
             <button
               onClick={() => {
                 if (!user) {
-                  // ✅ FIX: Checkout URL save karo — login ke baad seedha checkout pe
                   goToLoginWithRedirect(`/checkout?productId=${product._id}`);
                   return;
                 }
