@@ -2,24 +2,27 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
-  withCredentials: true, // cookies ke liye — session + JWT
+  withCredentials: true,
 });
 
-// Request interceptor — har request log karo dev mein
+// ✅ Har request mein token header mein add karo
 api.interceptors.request.use(
   (config) => {
     console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
+    
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — 401 handle karo
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default api;
