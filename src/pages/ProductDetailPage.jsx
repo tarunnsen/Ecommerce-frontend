@@ -41,18 +41,17 @@ export default function ProductDetailPage() {
   const { mutate: addToCart, isPending: addingToCart } = useMutation({
     mutationFn: () => cartService.addToCart(id),
     onSuccess: () => {
+      alert("SUCCESS — cart open ho raha hai"); // ← ye lagao
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       setCartOpen(true);
     },
     onError: (error) => {
-      // ✅ 401 hai toh login pe bhejo, warna cart already open karo
+      alert("ERROR: " + error?.response?.status + " — " + error?.response?.data?.message); // ← ye lagao
       if (error?.response?.status === 401) {
         sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
         navigate("/login");
       } else {
-        // ✅ Token hai but koi aur error — retry karo directly
-        console.log("Cart error:", error?.response?.data);
-        setCartOpen(true); // drawer open karo — user logged in hai
+        setCartOpen(true);
       }
     },
   });
