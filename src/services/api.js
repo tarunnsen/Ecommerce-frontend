@@ -1,5 +1,3 @@
-// src/services/api.js — FULL FILE
-
 import axios from "axios";
 
 const api = axios.create({
@@ -9,8 +7,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
-  
-  // ✅ NAYA LOG ADD KARO
+
   const userToken = localStorage.getItem("userToken");
   console.log("🔑 userToken in interceptor:", userToken ? "EXISTS: " + userToken.substring(0, 20) : "NULL ❌");
 
