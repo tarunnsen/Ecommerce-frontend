@@ -13,7 +13,6 @@ export default function ProtectedUserRoute({ children }) {
   }
 
   if (!user) {
-    // ✅ Yahan save karo — current URL jahan jaana tha
     sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
     return <Navigate to="/login" replace />;
   }
