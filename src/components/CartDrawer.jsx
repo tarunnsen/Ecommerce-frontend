@@ -1,5 +1,3 @@
-// src/components/CartDrawer.jsx
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cartService } from "../services/cartService";
 import { Link } from "react-router-dom";
@@ -31,7 +29,7 @@ export default function CartDrawer({ isOpen, onClose }) {
     onSuccess: () => queryClient.invalidateQueries(["cart"]),
   });
 
-  const items = (data?.products || []).filter(item => item.productId !== null);
+  const items = (data?.products || []).filter((item) => item.productId !== null);
 
   const totalPrice = items.reduce((acc, item) => {
     const price = item.productId?.discountPrice || item.productId?.price || 0;
@@ -41,43 +39,48 @@ export default function CartDrawer({ isOpen, onClose }) {
   return (
     <>
       {isOpen && (
-        <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }} />
+        <div
+          onClick={onClose}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }}
+        />
       )}
 
-      <div style={{
-        position: "fixed", top: 0, right: 0, bottom: 0, width: "100%", maxWidth: "384px",
-        background: "white", boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
-        transform: isOpen ? "translateX(0)" : "translateX(100%)",
-        transition: "transform 0.3s ease-in-out", zIndex: 50, overflowY: "auto",
-        display: "flex", flexDirection: "column",
-      }}>
-
-        {/* Header */}
+      <div
+        style={{
+          position: "fixed", top: 0, right: 0, bottom: 0, width: "100%", maxWidth: "384px",
+          background: "white", boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
+          transform: isOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.3s ease-in-out", zIndex: 50, overflowY: "auto",
+          display: "flex", flexDirection: "column",
+        }}
+      >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", borderBottom: "1px solid #e5e7eb" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: "700" }}>🛒 Your Cart</h2>
-          <button onClick={onClose} style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#6b7280" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "700" }}>Your Cart</h2>
+          <button
+            onClick={onClose}
+            style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#6b7280" }}
+          >
             ✕
           </button>
         </div>
 
-        {/* Body */}
         <div style={{ flex: 1, padding: "16px" }}>
           {isLoading ? (
             <p style={{ textAlign: "center", color: "#6b7280" }}>Loading...</p>
           ) : items.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#6b7280", marginTop: "40px" }}>Cart is empty 🛍️</p>
+            <p style={{ textAlign: "center", color: "#6b7280", marginTop: "40px" }}>Cart is empty</p>
           ) : (
             items.map((item) => (
-              <div key={item._id} style={{ display: "flex", gap: "12px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #f3f4f6" }}>
-
-                {/* Image */}
+              <div
+                key={item._id}
+                style={{ display: "flex", gap: "12px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #f3f4f6" }}
+              >
                 <img
                   src={item.productId?.images?.[0] || "/images/default.jpg"}
                   alt={item.productId?.name}
                   style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px", flexShrink: 0 }}
                 />
 
-                {/* Info */}
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: "600", fontSize: "14px", marginBottom: "4px" }}>
                     {item.productId?.name}
@@ -118,40 +121,26 @@ export default function CartDrawer({ isOpen, onClose }) {
           )}
         </div>
 
-        {/* ✅ Footer — SIRF YAHAN CHANGE KIYA HAI */}
         {items.length > 0 && (
           <div style={{ padding: "16px", borderTop: "1px solid #e5e7eb", background: "white" }}>
-            
-            {/* Total — same as before */}
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
               <span style={{ fontWeight: "600" }}>Total:</span>
               <span style={{ fontWeight: "700", color: "#16a34a" }}>₹{totalPrice}</span>
             </div>
 
-            {/* View Full Cart — same as before */}
-            <Link
-              to="/cart"
-              style={{ display: "block", textAlign: "center", padding: "12px", background: "#1d4ed8", color: "white", borderRadius: "8px", textDecoration: "none", fontWeight: "600" }}
-            >
-              View Full Cart
-            </Link>
-
-            {/* ✅ NAYA BUTTON — Proceed to Pay */}
             <Link
               to="/checkout"
               onClick={onClose}
               style={{
                 display: "block", textAlign: "center", padding: "12px",
                 background: "#16a34a", color: "white", borderRadius: "8px",
-                textDecoration: "none", fontWeight: "600", marginTop: "8px",
+                textDecoration: "none", fontWeight: "600",
               }}
             >
               Proceed to Pay
             </Link>
-
           </div>
         )}
-
       </div>
     </>
   );
