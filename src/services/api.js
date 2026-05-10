@@ -6,11 +6,6 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  console.log(`→ ${config.method?.toUpperCase()} ${config.url}`);
-
-  const userToken = localStorage.getItem("userToken");
-  console.log("🔑 userToken in interceptor:", userToken ? "EXISTS: " + userToken.substring(0, 20) : "NULL ❌");
-
   const isAdminRoute = config.url?.startsWith("/admin");
 
   if (isAdminRoute) {
@@ -19,19 +14,24 @@ api.interceptors.request.use((config) => {
       config.headers["Authorization"] = `Bearer ${adminToken}`;
     }
   } else {
+    const userToken = localStorage.getItem("userToken");
     if (userToken) {
       config.headers["Authorization"] = `Bearer ${userToken}`;
     }
   }
-
-  console.log("📤 Auth header:", config.headers["Authorization"] ? "SET ✅" : "NOT SET ❌");
 
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("userToken");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default api;

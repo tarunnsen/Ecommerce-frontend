@@ -14,7 +14,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     await logout();
     setMobileOpen(false);
-    navigate("/login"); // ✅ FIXED
+    navigate("/login");
   };
 
   return (
@@ -35,7 +35,7 @@ export default function Navbar() {
           {user ? (
             <>
               <span className="text-sm font-medium text-[#0e121b] hidden md:inline">
-                Hi, {user.name}
+                Hi, {firstName}
               </span>
               <button
                 onClick={handleLogout}
@@ -46,7 +46,7 @@ export default function Navbar() {
             </>
           ) : (
             <Link
-              to="/login" // ✅ FIXED
+              to="/login"
               className="hidden md:flex h-9 px-3 rounded-xl bg-[#e7ebf3] text-sm font-bold items-center whitespace-nowrap"
               style={{ textDecoration: "none" }}
             >
@@ -98,7 +98,7 @@ export default function Navbar() {
             </>
           ) : (
             <Link
-              to="/login" // ✅ FIXED
+              to="/login"
               onClick={() => setMobileOpen(false)}
               className="text-sm font-medium py-2"
             >
