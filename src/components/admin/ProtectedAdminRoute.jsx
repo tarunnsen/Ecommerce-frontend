@@ -1,13 +1,11 @@
-// src/components/admin/ProtectedAdminRoute.jsx
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { adminService } from "../../services/adminService";
 
 export default function ProtectedAdminRoute({ children }) {
-  const [status, setStatus] = useState("loading"); // loading | auth | unauth
+  const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    // ✅ Admin verify karo — JWT cookie backend check karega
     adminService
       .verifyAdmin()
       .then(() => setStatus("auth"))
@@ -17,10 +15,7 @@ export default function ProtectedAdminRoute({ children }) {
   if (status === "loading") {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f9fafb" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>🔐</div>
-          <p style={{ color: "#6b7280" }}>Verifying admin access...</p>
-        </div>
+        <p style={{ color: "#6b7280" }}>Verifying admin access...</p>
       </div>
     );
   }
