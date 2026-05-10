@@ -16,17 +16,65 @@ export default function CartDrawer({ isOpen, onClose }) {
 
   const { mutate: increase } = useMutation({
     mutationFn: (id) => cartService.addToCart(id),
-    onSuccess: () => queryClient.invalidateQueries(["cart"]),
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries(["cart"]);
+      const previous = queryClient.getQueryData(["cart"]);
+      queryClient.setQueryData(["cart"], (old) => ({
+        ...old,
+        products: old.products.map((item) =>
+          item.productId._id === productId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        ),
+      }));
+      return { previous };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["cart"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
 
   const { mutate: decrease } = useMutation({
     mutationFn: (id) => cartService.decrease(id),
-    onSuccess: () => queryClient.invalidateQueries(["cart"]),
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries(["cart"]);
+      const previous = queryClient.getQueryData(["cart"]);
+      queryClient.setQueryData(["cart"], (old) => ({
+        ...old,
+        products: old.products
+          .map((item) =>
+            item.productId._id === productId
+              ? { ...item, quantity: item.quantity - 1 }
+              : item
+          )
+          .filter((item) => item.quantity > 0),
+      }));
+      return { previous };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["cart"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
 
   const { mutate: remove } = useMutation({
     mutationFn: (id) => cartService.remove(id),
-    onSuccess: () => queryClient.invalidateQueries(["cart"]),
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries(["cart"]);
+      const previous = queryClient.getQueryData(["cart"]);
+      queryClient.setQueryData(["cart"], (old) => ({
+        ...old,
+        products: old.products.filter(
+          (item) => item.productId._id !== productId
+        ),
+      }));
+      return { previous };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["cart"], context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
 
   const items = (data?.products || []).filter((item) => item.productId !== null);
