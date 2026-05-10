@@ -19,18 +19,23 @@ export default function CartDrawer({ isOpen, onClose }) {
     onMutate: async (productId) => {
       await queryClient.cancelQueries(["cart"]);
       const previous = queryClient.getQueryData(["cart"]);
-      queryClient.setQueryData(["cart"], (old) => ({
-        ...old,
-        products: old.products.map((item) =>
-          item.productId._id === productId
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        ),
-      }));
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          products: old.products.map((item) =>
+            item.productId._id === productId
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          ),
+        };
+      });
       return { previous };
     },
     onError: (err, id, context) => {
-      queryClient.setQueryData(["cart"], context.previous);
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
     },
     onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
@@ -40,20 +45,25 @@ export default function CartDrawer({ isOpen, onClose }) {
     onMutate: async (productId) => {
       await queryClient.cancelQueries(["cart"]);
       const previous = queryClient.getQueryData(["cart"]);
-      queryClient.setQueryData(["cart"], (old) => ({
-        ...old,
-        products: old.products
-          .map((item) =>
-            item.productId._id === productId
-              ? { ...item, quantity: item.quantity - 1 }
-              : item
-          )
-          .filter((item) => item.quantity > 0),
-      }));
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          products: old.products
+            .map((item) =>
+              item.productId._id === productId
+                ? { ...item, quantity: item.quantity - 1 }
+                : item
+            )
+            .filter((item) => item.quantity > 0),
+        };
+      });
       return { previous };
     },
     onError: (err, id, context) => {
-      queryClient.setQueryData(["cart"], context.previous);
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
     },
     onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
@@ -63,16 +73,21 @@ export default function CartDrawer({ isOpen, onClose }) {
     onMutate: async (productId) => {
       await queryClient.cancelQueries(["cart"]);
       const previous = queryClient.getQueryData(["cart"]);
-      queryClient.setQueryData(["cart"], (old) => ({
-        ...old,
-        products: old.products.filter(
-          (item) => item.productId._id !== productId
-        ),
-      }));
+      queryClient.setQueryData(["cart"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          products: old.products.filter(
+            (item) => item.productId._id !== productId
+          ),
+        };
+      });
       return { previous };
     },
     onError: (err, id, context) => {
-      queryClient.setQueryData(["cart"], context.previous);
+      if (context?.previous) {
+        queryClient.setQueryData(["cart"], context.previous);
+      }
     },
     onSettled: () => queryClient.invalidateQueries(["cart"]),
   });
