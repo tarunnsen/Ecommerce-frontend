@@ -17,7 +17,7 @@ export default function CartDrawer({ isOpen, onClose }) {
   const { mutate: increase } = useMutation({
     mutationFn: (id) => cartService.addToCart(id),
     onMutate: async (productId) => {
-      await queryClient.cancelQueries(["cart"]);
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
         if (!old) return old;
@@ -37,13 +37,13 @@ export default function CartDrawer({ isOpen, onClose }) {
         queryClient.setQueryData(["cart"], context.previous);
       }
     },
-    onSettled: () => queryClient.invalidateQueries(["cart"]),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 
   const { mutate: decrease } = useMutation({
     mutationFn: (id) => cartService.decrease(id),
     onMutate: async (productId) => {
-      await queryClient.cancelQueries(["cart"]);
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
         if (!old) return old;
@@ -65,13 +65,13 @@ export default function CartDrawer({ isOpen, onClose }) {
         queryClient.setQueryData(["cart"], context.previous);
       }
     },
-    onSettled: () => queryClient.invalidateQueries(["cart"]),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 
   const { mutate: remove } = useMutation({
     mutationFn: (id) => cartService.remove(id),
     onMutate: async (productId) => {
-      await queryClient.cancelQueries(["cart"]);
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
         if (!old) return old;
@@ -89,7 +89,7 @@ export default function CartDrawer({ isOpen, onClose }) {
         queryClient.setQueryData(["cart"], context.previous);
       }
     },
-    onSettled: () => queryClient.invalidateQueries(["cart"]),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 
   const items = (data?.products || []).filter((item) => item.productId !== null);
