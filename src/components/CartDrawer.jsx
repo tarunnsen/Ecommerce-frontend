@@ -20,11 +20,11 @@ export default function CartDrawer({ isOpen, onClose }) {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old.products)) return old;
         return {
           ...old,
           products: old.products.map((item) =>
-            item.productId._id === productId
+            item.productId?._id === productId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
@@ -32,7 +32,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       });
       return { previous };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previous) {
         queryClient.setQueryData(["cart"], context.previous);
       }
@@ -46,12 +46,12 @@ export default function CartDrawer({ isOpen, onClose }) {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old.products)) return old;
         return {
           ...old,
           products: old.products
             .map((item) =>
-              item.productId._id === productId
+              item.productId?._id === productId
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
             )
@@ -60,7 +60,7 @@ export default function CartDrawer({ isOpen, onClose }) {
       });
       return { previous };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previous) {
         queryClient.setQueryData(["cart"], context.previous);
       }
@@ -74,17 +74,17 @@ export default function CartDrawer({ isOpen, onClose }) {
       await queryClient.cancelQueries({ queryKey: ["cart"] });
       const previous = queryClient.getQueryData(["cart"]);
       queryClient.setQueryData(["cart"], (old) => {
-        if (!old) return old;
+        if (!old || !Array.isArray(old.products)) return old;
         return {
           ...old,
           products: old.products.filter(
-            (item) => item.productId._id !== productId
+            (item) => item.productId?._id !== productId
           ),
         };
       });
       return { previous };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previous) {
         queryClient.setQueryData(["cart"], context.previous);
       }
@@ -104,24 +104,49 @@ export default function CartDrawer({ isOpen, onClose }) {
       {isOpen && (
         <div
           onClick={onClose}
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 40 }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 40,
+          }}
         />
       )}
 
       <div
         style={{
-          position: "fixed", top: 0, right: 0, bottom: 0, width: "100%", maxWidth: "384px",
-          background: "white", boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
+          position: "fixed",
+          top: 0, right: 0, bottom: 0,
+          width: "100%", maxWidth: "384px",
+          background: "white",
+          boxShadow: "-4px 0 20px rgba(0,0,0,0.15)",
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.3s ease-in-out", zIndex: 50, overflowY: "auto",
-          display: "flex", flexDirection: "column",
+          transition: "transform 0.3s ease-in-out",
+          zIndex: 50,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", borderBottom: "1px solid #e5e7eb" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "16px",
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
           <h2 style={{ fontSize: "18px", fontWeight: "700" }}>Your Cart</h2>
           <button
             onClick={onClose}
-            style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer", color: "#6b7280" }}
+            style={{
+              fontSize: "24px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#6b7280",
+            }}
           >
             ✕
           </button>
@@ -131,17 +156,30 @@ export default function CartDrawer({ isOpen, onClose }) {
           {isLoading ? (
             <p style={{ textAlign: "center", color: "#6b7280" }}>Loading...</p>
           ) : items.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#6b7280", marginTop: "40px" }}>Cart is empty</p>
+            <p style={{ textAlign: "center", color: "#6b7280", marginTop: "40px" }}>
+              Cart is empty
+            </p>
           ) : (
             items.map((item) => (
               <div
                 key={item._id}
-                style={{ display: "flex", gap: "12px", marginBottom: "16px", paddingBottom: "16px", borderBottom: "1px solid #f3f4f6" }}
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginBottom: "16px",
+                  paddingBottom: "16px",
+                  borderBottom: "1px solid #f3f4f6",
+                }}
               >
                 <img
                   src={item.productId?.images?.[0] || "/images/default.jpg"}
                   alt={item.productId?.name}
-                  style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px", flexShrink: 0 }}
+                  style={{
+                    width: "80px", height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    flexShrink: 0,
+                  }}
                 />
 
                 <div style={{ flex: 1 }}>
@@ -155,7 +193,14 @@ export default function CartDrawer({ isOpen, onClose }) {
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <button
                       onClick={() => decrease(item.productId?._id)}
-                      style={{ width: "28px", height: "28px", border: "1px solid #d1d5db", borderRadius: "4px", background: "white", cursor: "pointer", fontSize: "16px" }}
+                      style={{
+                        width: "28px", height: "28px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "4px",
+                        background: "white",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                      }}
                     >
                       −
                     </button>
@@ -166,14 +211,29 @@ export default function CartDrawer({ isOpen, onClose }) {
 
                     <button
                       onClick={() => increase(item.productId?._id)}
-                      style={{ width: "28px", height: "28px", border: "1px solid #d1d5db", borderRadius: "4px", background: "white", cursor: "pointer", fontSize: "16px" }}
+                      style={{
+                        width: "28px", height: "28px",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "4px",
+                        background: "white",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                      }}
                     >
                       +
                     </button>
 
                     <button
                       onClick={() => remove(item.productId?._id)}
-                      style={{ padding: "4px 10px", background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
+                      style={{
+                        padding: "4px 10px",
+                        background: "#fee2e2",
+                        color: "#dc2626",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                      }}
                     >
                       Remove
                     </button>
@@ -185,7 +245,13 @@ export default function CartDrawer({ isOpen, onClose }) {
         </div>
 
         {items.length > 0 && (
-          <div style={{ padding: "16px", borderTop: "1px solid #e5e7eb", background: "white" }}>
+          <div
+            style={{
+              padding: "16px",
+              borderTop: "1px solid #e5e7eb",
+              background: "white",
+            }}
+          >
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
               <span style={{ fontWeight: "600" }}>Total:</span>
               <span style={{ fontWeight: "700", color: "#16a34a" }}>₹{totalPrice}</span>
@@ -195,9 +261,14 @@ export default function CartDrawer({ isOpen, onClose }) {
               to="/checkout"
               onClick={onClose}
               style={{
-                display: "block", textAlign: "center", padding: "12px",
-                background: "#16a34a", color: "white", borderRadius: "8px",
-                textDecoration: "none", fontWeight: "600",
+                display: "block",
+                textAlign: "center",
+                padding: "12px",
+                background: "#16a34a",
+                color: "white",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontWeight: "600",
               }}
             >
               Proceed to Pay
