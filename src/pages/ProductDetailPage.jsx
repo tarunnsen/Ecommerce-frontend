@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "../services/productService";
 import { cartService } from "../services/cartService";
 import { useAuth } from "../context/AuthContext";
-import CartDrawer from "../components/CartDrawer";
 import Navbar from "../components/Navbar";
 
 const COLOR_MAP = {
@@ -22,7 +21,6 @@ export default function ProductDetailPage() {
   const { user } = useAuth();
 
   const [mainImage, setMainImage] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
@@ -36,14 +34,11 @@ export default function ProductDetailPage() {
     mutationFn: () => cartService.addToCart(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      setCartOpen(true);
     },
     onError: (error) => {
       if (error?.response?.status === 401) {
         sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
         navigate("/login");
-      } else {
-        setCartOpen(true);
       }
     },
   });
@@ -282,7 +277,6 @@ export default function ProductDetailPage() {
         </div>
       </footer>
 
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }
