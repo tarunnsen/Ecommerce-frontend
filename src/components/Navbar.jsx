@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import CartDrawer from "./CartDrawer";
 
-export default function Navbar() {
+export default function Navbar({ onCartOpen }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -55,7 +53,7 @@ export default function Navbar() {
           )}
 
           <button
-            onClick={() => setCartOpen(true)}
+            onClick={() => onCartOpen?.()}
             className="h-9 px-2.5 rounded-xl bg-[#e7ebf3] text-sm font-bold flex items-center"
           >
             🛍️
@@ -107,8 +105,6 @@ export default function Navbar() {
           )}
         </div>
       )}
-
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }

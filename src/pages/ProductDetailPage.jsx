@@ -14,7 +14,7 @@ const COLOR_MAP = {
   white: { background: "white", border: "1px solid #d1d5db" },
 };
 
-export default function ProductDetailPage() {
+export default function ProductDetailPage({ onCartOpen }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -34,6 +34,7 @@ export default function ProductDetailPage() {
     mutationFn: () => cartService.addToCart(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      onCartOpen?.();
     },
     onError: (error) => {
       if (error?.response?.status === 401) {
@@ -51,7 +52,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <>
-        <Navbar />
+        <Navbar onCartOpen={onCartOpen} />
         <div style={{ textAlign: "center", padding: "80px", fontSize: "18px" }}>Loading...</div>
       </>
     );
@@ -60,7 +61,7 @@ export default function ProductDetailPage() {
   if (isError || !data?.product) {
     return (
       <>
-        <Navbar />
+        <Navbar onCartOpen={onCartOpen} />
         <div style={{ textAlign: "center", padding: "80px", fontSize: "18px", color: "red" }}>
           Product not found.
         </div>
@@ -74,7 +75,7 @@ export default function ProductDetailPage() {
   return (
     <div style={{ background: "#f8f9fc", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-      <Navbar />
+      <Navbar onCartOpen={onCartOpen} />
 
       <div
         className="container mx-auto px-4 sm:px-6 lg:px-8 py-12"
