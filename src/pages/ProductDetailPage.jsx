@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "../services/productService";
@@ -19,14 +19,10 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user, checkAuth } = useAuth();
+  const { user } = useAuth();
 
   const [mainImage, setMainImage] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["product", id],
@@ -89,7 +85,6 @@ export default function ProductDetailPage() {
         className="container mx-auto px-4 sm:px-6 lg:px-8 py-12"
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "32px" }}
       >
-        {/* Image Gallery */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <img
             src={displayImage}
@@ -122,7 +117,6 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* Product Details */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           <h1 style={{ fontSize: "30px", fontWeight: "700" }}>{product.name}</h1>
 
@@ -219,7 +213,6 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      {/* Related Products */}
       {relatedProducts?.length > 0 && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h2 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "24px" }}>Related Products</h2>
@@ -253,7 +246,6 @@ export default function ProductDetailPage() {
         </div>
       )}
 
-      {/* Footer */}
       <footer style={{ background: "#111827", color: "white", padding: "48px 0", marginTop: "auto" }}>
         <div className="container mx-auto px-4">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px" }}>
